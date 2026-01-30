@@ -54,14 +54,14 @@ namespace Mezclador.Users
                 return false;
             }
 
-            if (FirstFinger is null || SecondFinger is null)
-            {
-                if (_crudType == CrudType.Create)
-                {
-                    MessageBox.Show("Es necesario registrar ambas huellas");
-                    return false;
-                }
-            }
+            //if (FirstFinger is null || SecondFinger is null)
+            //{
+            //    if (_crudType == CrudType.Create)
+            //    {
+            //        MessageBox.Show("Es necesario registrar ambas huellas");
+            //        return false;
+            //    }
+            //}
             return true;
         }
         private void btnRegister_Click(object sender, EventArgs e)
