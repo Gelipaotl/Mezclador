@@ -556,7 +556,7 @@ namespace Mezclador
         {
             try
             {
-                string Query = "SELECT * FROM usuarios WHERE pass = @Pass LIMIT 1;";
+                string Query = "SELECT * FROM usuarios WHERE pass = @Pass AND permisos != 'Eliminado' LIMIT 1;";
                 using MySqlConnection mySqlConnection = new(ConnectionString);
                 mySqlConnection.Open();
                 using MySqlCommand mySqlCommand = new(Query, mySqlConnection);
@@ -586,7 +586,8 @@ namespace Mezclador
             List<UsersViewModel> listaDatos = new();
             try
             {
-                string Query = "Select * From usuarios order by Nombre asc;";
+                //string Query = "Select * From usuarios order by Nombre asc;";
+                string Query = "SELECT * FROM usuarios WHERE permisos != 'Eliminado' ORDER BY Nombre ASC;";
                 //string Query =  "Select ID, Nombre, Permiso From usuarios INNER JOIN permisos ON permisos.ID = usuarios.permisos order by Nombre asc;";
                 using MySqlConnection connection = new(ConnectionString);
                 connection.Open();
@@ -640,7 +641,8 @@ namespace Mezclador
             UsuarioModel usuario = new();
             try
             {
-                string Query = "Delete From usuarios Where id = @id";
+                //string Query = "Delete From usuarios Where id = @id";
+                string Query = "UPDATE usuarios SET permisos = 'Eliminado' WHERE id = @id";
                 using MySqlConnection connection = new(ConnectionString);
                 connection.Open();
                 MySqlCommand command = new(Query, connection);
@@ -720,7 +722,7 @@ namespace Mezclador
             Huellas.ListHuellas.Clear();
             try
             {
-                string Query = "SELECT * FROM usuarios";
+                string Query = "SELECT * FROM usuarios WHERE permisos != 'Eliminado'";
                 using MySqlConnection connection = new(ConnectionString);
                 connection.Open();
                 using MySqlCommand command = new(Query, connection);
@@ -1246,9 +1248,9 @@ namespace Mezclador
             {
                 int maxLength;
                 using MySqlConnection connectionPre = new(ConnectionString);
-                    connectionPre.Open();
+                connectionPre.Open();
                 using MySqlCommand command = new MySqlCommand("SELECT CHARACTER_MAXIMUM_LENGTH FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'calidad' AND COLUMN_NAME = 'comentario'", connectionPre);
-                    maxLength = Convert.ToInt32(command.ExecuteScalar());
+                maxLength = Convert.ToInt32(command.ExecuteScalar());
 
                 // Recortar el comentario si es necesario
                 if (comentario.Length > maxLength)

@@ -1,0 +1,14 @@
+1.0.4.3 6 marzo 2025
+-Se agrego la opción de crear el reporte de forma manual
+-Se agrego un botón de eliminar para recetas y una forma para restaurarlas si se eliminaron
+-A la hora de consultar usuarios conectaba con tabla permisos cosa que según yo ya se había eliminado porque solo le puse que consultara la tabla usuarios
+
+1.0.4.4 (según evidencia de mensajes)
+-Se corrigió un bug a la hora de crea cargas, se desconocen mas detalles
+
+1.0.4.5 13 marzo 2025 (según evidencia de mensajes)
+-en el reporte excel algunos valores posiblemente los de litros aparecían en 0, se desconoce si la solución fue a la hora de guardar la cantidad en la tabla consumo o en la clase del excel
+
+1.0.4.6 fecha por definir
+-Fallo de retroalimentacion Reporte manual excel cuando no hay registros en la fecha seleccionada dice que si guardo correctamente el repote
+-Bug no se pueden eliminar usuarios que ya hicieron receta porque esta las tablas cargas y calidad en delete no action
