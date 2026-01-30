@@ -239,7 +239,11 @@ namespace Mezclador
                 fechaFin.Value = new(fechaFin.Value.Year, fechaFin.Value.Month, fechaFin.Value.Day, horaFin.SelectedIndex, 0, 0);
                 Excel excel = new();
                 await excel.Create(fechaInicio.Value, fechaFin.Value);
-
+                if (excel.excelPackage is null)
+                {
+                    MessageBox.Show($"No se encontraron registros en el rango de fechas.");
+                    return;
+                }
                 if (MessageBox.Show($"Archivo guardado correctamente en \n{excel.filePath}\nAbrir archivo?", "Archivo guardado",MessageBoxButtons.YesNo) == DialogResult.Yes)
                 {
                     Process.Start(new ProcessStartInfo(excel.filePath) { UseShellExecute = true });

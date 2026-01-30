@@ -133,6 +133,7 @@ namespace Mezclador.Services
             catch (Exception ex)
             {
                 Console.WriteLine($"Error al guardar el archivo: {ex.Message}");
+                //no usar MessageBox porque email tambien usa esta funcion
             }
             Console.WriteLine($"Archivo Excel guardado en: {filePath}");
             //}

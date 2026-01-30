@@ -78,6 +78,11 @@ namespace Mezclador.Users
             var id = GetSelectedId();
             if (id > 0)
             {
+                if (Usuario.Id == id)
+                {
+                    MessageBox.Show("No es posible eliminarte a ti mismo");
+                    return;
+                }
                 var result = MessageBox.Show("Eliminar usuario?", "Confirmación", MessageBoxButtons.YesNo);
                 if (result == DialogResult.Yes)
                 {
