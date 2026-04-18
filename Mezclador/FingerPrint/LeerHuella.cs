@@ -1,6 +1,7 @@
 ﻿
 using System.Runtime.InteropServices;
 using System.Text;
+using Mezclador.FingerPrint;
 using Mezclador.Models;
 using Mezclador.Users;
 using static Mezclador.Users.Usuario;
@@ -31,92 +32,93 @@ namespace Mezclador
 
             btnPassword.Click += new EventHandler(btnPass_Click);
             tBoxPassword.KeyPress += new KeyPressEventHandler(tBoxPassword_KeyPress);
+            FingerService.Identify();
         }
 
-        protected override void Process(DPFP.Sample Sample)
-        {
-            base.Process(Sample);
-            try
-            {
-                // Process the sample and create a feature set for the enrollment purpose.
-                DPFP.FeatureSet features = ExtractFeatures(Sample, DPFP.Processing.DataPurpose.Verification);
+        //protected override void Process(DPFP.Sample Sample)
+        //{
+        //    base.Process(Sample);
+        //    try
+        //    {
+        //        // Process the sample and create a feature set for the enrollment purpose.
+        //        DPFP.FeatureSet features = ExtractFeatures(Sample, DPFP.Processing.DataPurpose.Verification);
 
-                // Check quality of the sample and start verification if it's good
+        //        // Check quality of the sample and start verification if it's good
 
-                if (features != null)
-                {
-                    // Compare the feature set with our template
-                    DPFP.Verification.Verification.Result result = new();
+        //        if (features != null)
+        //        {
+        //            // Compare the feature set with our template
+        //            DPFP.Verification.Verification.Result result = new();
 
-                    //Encoding encoding = Encoding.UTF8;
+        //            //Encoding encoding = Encoding.UTF8;
 
-                    foreach (var item in Huellas.ListHuellas)
-                    {
-                        if (item.Huella.Length > 1500)
-                        {
-                            try
-                            {
-                                DPFP.Template template = new();
-                                template.DeSerialize(item.Huella);
+        //            foreach (var item in Huellas.ListHuellas)
+        //            {
+        //                if (item.Huella.Length > 1500)
+        //                {
+        //                    try
+        //                    {
+        //                        DPFP.Template template = new();
+        //                        template.DeSerialize(item.Huella);
 
-                                Verificator.Verify(features, template, ref result);
-                                UpdateStatus(result.FARAchieved);
-                                if (result.Verified)
-                                {
-                                    MakeReport("La huella es CORRECTA.");
-                                    if (_onlyQuality)
-                                    {
-                                        if (item.Permisos != Permisos.Calidad.ToString() &&
-                                            item.Permisos != Permisos.Total.ToString())
-                                        {
-                                            //MessageBox.Show("La huella no corresponde a Calidad");
-                                            MakeReport("La huella no corresponde a Calidad");
-                                        }
-                                        else
-                                        {
-                                            comentarioCalidad comCalidad = new();
-                                            comCalidad.ShowDialog();
-                                            string comentario = comCalidad.Comentario;
+        //                        Verificator.Verify(features, template, ref result);
+        //                        UpdateStatus(result.FARAchieved);
+        //                        if (result.Verified)
+        //                        {
+        //                            MakeReport("La huella es CORRECTA.");
+        //                            if (_onlyQuality)
+        //                            {
+        //                                if (item.Permisos != Permisos.Calidad.ToString() &&
+        //                                    item.Permisos != Permisos.Total.ToString())
+        //                                {
+        //                                    //MessageBox.Show("La huella no corresponde a Calidad");
+        //                                    MakeReport("La huella no corresponde a Calidad");
+        //                                }
+        //                                else
+        //                                {
+        //                                    comentarioCalidad comCalidad = new();
+        //                                    comCalidad.ShowDialog();
+        //                                    string comentario = comCalidad.Comentario;
 
-                                            if (ConexionDB.QualityRegister(item.Id, comentario))
-                                            {
-                                                MakeReport("Huella de calidad registrada");
-                                                CloseForm();
-                                                //MessageBox.Show("Huella de calidad registrada");
-                                            }
-                                        }
-                                        break;
-                                    }
-                                    MoveModelToLogged(item.Id, item.Nombre, item.Permisos);
-                                    UserLoged = true;
-                                    CloseForm();
-                                    break;
-                                }
-                                else
-                                    MakeReport("La huella es INCORRECTA.");
-                            }
-                            catch (Exception ex)
-                            {
-                                // Handle any exceptions that occur during deserialization or verification
-                                MakeReport($"Error al verificar la huella de {item.Nombre}: {ex.Message}");
-                            }
-                        }
-                    }
-                    if (Huellas.ListHuellas.Count <= 0)
-                        MakeReport("No hay usuarios registrados.");
-                }
-            }
-            catch (COMException) { }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.ToString());
-            }
-        }
+        //                                    if (ConexionDB.QualityRegister(item.Id, comentario))
+        //                                    {
+        //                                        MakeReport("Huella de calidad registrada");
+        //                                        CloseForm();
+        //                                        //MessageBox.Show("Huella de calidad registrada");
+        //                                    }
+        //                                }
+        //                                break;
+        //                            }
+        //                            MoveModelToLogged(item.Id, item.Nombre, item.Permisos);
+        //                            UserLoged = true;
+        //                            CloseForm();
+        //                            break;
+        //                        }
+        //                        else
+        //                            MakeReport("La huella es INCORRECTA.");
+        //                    }
+        //                    catch (Exception ex)
+        //                    {
+        //                        // Handle any exceptions that occur during deserialization or verification
+        //                        MakeReport($"Error al verificar la huella de {item.Nombre}: {ex.Message}");
+        //                    }
+        //                }
+        //            }
+        //            if (Huellas.ListHuellas.Count <= 0)
+        //                MakeReport("No hay usuarios registrados.");
+        //        }
+        //    }
+        //    catch (COMException) { }
+        //    catch (Exception ex)
+        //    {
+        //        MessageBox.Show(ex.ToString());
+        //    }
+        //}
 
         private void UpdateStatus(int FAR)
         {
             // Show "False accept rate" value
-            SetStatus(String.Format($"Tasa de rechazo (FAR) = {FAR}"));
+            //SetStatus(String.Format($"Tasa de rechazo (FAR) = {FAR}"));
         }
         private void MoveModelToLogged(int Id, string Nombre, string Permisos)
         {

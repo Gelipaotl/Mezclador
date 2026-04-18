@@ -20,6 +20,7 @@ namespace Mezclador
 
 			SettingManagement.LoadUserSettings();
 			Email email = new();
+
             Application.Run(new Header());
         }
     }

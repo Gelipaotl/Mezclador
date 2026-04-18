@@ -58,6 +58,7 @@
             Picture.SizeMode = PictureBoxSizeMode.Zoom;
             Picture.TabIndex = 1;
             Picture.TabStop = false;
+            Picture.Click += Picture_Click;
             // 
             // Status
             // 

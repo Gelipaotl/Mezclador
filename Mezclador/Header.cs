@@ -1,4 +1,5 @@
 
+using Mezclador.FingerPrint;
 using Mezclador.Users;
 
 namespace Mezclador
@@ -107,6 +108,7 @@ namespace Mezclador
             {
                 RS232_BasculaPesada.Close();
                 RS232_BasculaLigera.Close();
+                FingerService.CloseDevice();
             }
             else
                 e.Cancel = true; // Cancelar el cierre del formulario

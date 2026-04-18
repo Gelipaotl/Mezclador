@@ -101,26 +101,26 @@ namespace Mezclador.Users
         {
             RegistroHuella registroHuella = new RegistroHuella();
             registroHuella.ShowDialog();
-            if (registroHuella.Enroller.TemplateStatus ==
-                DPFP.Processing.Enrollment.Status.Ready)
-            {
-                FirstFinger = registroHuella.Enroller.Template.Bytes;
-                btnRegFinger1.Text = "Huella registra";
-                btnRegFinger1.Enabled = false;
-            }
+            //if (registroHuella.Enroller.TemplateStatus ==
+            //    DPFP.Processing.Enrollment.Status.Ready)
+            //{
+            //    FirstFinger = registroHuella.Enroller.Template.Bytes;
+            //    btnRegFinger1.Text = "Huella registra";
+            //    btnRegFinger1.Enabled = false;
+            //}
         }
 
         private void btnRegFinger2_Click(object sender, EventArgs e)
         {
             RegistroHuella registroHuella = new RegistroHuella();
             registroHuella.ShowDialog();
-            if (registroHuella.Enroller.TemplateStatus ==
-                DPFP.Processing.Enrollment.Status.Ready)
-            {
-                SecondFinger = registroHuella.Enroller.Template.Bytes;
-                btnRegFinger2.Text = "Huella registra";
-                btnRegFinger2.Enabled = false;
-            }
+            //if (registroHuella.Enroller.TemplateStatus ==
+            //    DPFP.Processing.Enrollment.Status.Ready)
+            //{
+            //    SecondFinger = registroHuella.Enroller.Template.Bytes;
+            //    btnRegFinger2.Text = "Huella registra";
+            //    btnRegFinger2.Enabled = false;
+            //}
         }
 
         private void cboxPermisos_SelectedIndexChanged(object sender, EventArgs e)
