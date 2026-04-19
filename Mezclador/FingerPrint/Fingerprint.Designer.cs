@@ -76,9 +76,8 @@
             StatusLine.Location = new Point(33, 362);
             StatusLine.Margin = new Padding(4, 0, 4, 0);
             StatusLine.Name = "StatusLine";
-            StatusLine.Size = new Size(160, 24);
+            StatusLine.Size = new Size(0, 24);
             StatusLine.TabIndex = 3;
-            StatusLine.Text = "Lecturas restantes";
             // 
             // lblPassword
             // 

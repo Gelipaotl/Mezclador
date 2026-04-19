@@ -25,18 +25,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="DPFPDevNET">
-      <HintPath>..\..\..\..\..\..\Program Files\DigitalPersona\One Touch SDK\.NET\Bin\DPFPDevNET.dll</HintPath>
-    </Reference>
-    <Reference Include="DPFPEngNET">
-      <HintPath>..\..\..\..\..\..\Program Files\DigitalPersona\One Touch SDK\.NET\Bin\DPFPEngNET.dll</HintPath>
-    </Reference>
-    <Reference Include="DPFPShrNET">
-      <HintPath>..\..\..\..\..\..\Program Files\DigitalPersona\One Touch SDK\.NET\Bin\DPFPShrNET.dll</HintPath>
-    </Reference>
-    <Reference Include="DPFPVerNET">
-      <HintPath>..\..\..\..\..\..\Program Files\DigitalPersona\One Touch SDK\.NET\Bin\DPFPVerNET.dll</HintPath>
-    </Reference>
     <Reference Include="libzkfpcsharp">
       <HintPath>..\..\..\9774a946c3f659ddf2ae90bc8dadc3eb\ZKFingerSDK_Windows_Standard\ZKFinger Standard SDK 5.3.0.33\C#\lib\x64\libzkfpcsharp.dll</HintPath>
       <Private>True</Private>

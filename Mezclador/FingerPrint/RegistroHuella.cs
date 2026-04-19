@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Mezclador.FingerPrint;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -13,9 +14,9 @@ namespace Mezclador
     public partial class RegistroHuella : Fingerprint
     {
         bool CanClose = false;
-        public delegate void OnTemplateEventHandler(DPFP.Template template);
+        //public delegate void OnTemplateEventHandler(DPFP.Template template);
 
-        public event OnTemplateEventHandler OnTemplate;
+        //public event OnTemplateEventHandler OnTemplate;
         protected override void Init()
         {
             base.Init();
@@ -27,6 +28,9 @@ namespace Mezclador
             tBoxPassword.Visible = false;
             btnPassword.Visible = false;
             //UpdateStatus();
+            Register();
+            //FingerService.Register();
+            //MakeReport("Lecturas restantes: " + (FingerService.REGISTER_FINGER_COUNT - FingerService.RegisterCount));
         }
 
     //    protected override void Process(DPFP.Sample Sample)
@@ -72,14 +76,14 @@ namespace Mezclador
     //        // Show number of samples needed.
     //        SetStatus(String.Format($"Lecturas restantes: {Enroller.FeaturesNeeded}"));
     //    }
-    //    private void CloseForm()
-    //    {
-    //        //se utiliza para acceder al form base, si se usa this.Close(); a secas genera exception 
-    //        this.Invoke((MethodInvoker)delegate
-    //        {
-    //            this.Close();
-    //        });
-    //    }
+        private void CloseForm()
+        {
+            //se utiliza para acceder al form base, si se usa this.Close(); a secas genera exception 
+            this.Invoke((MethodInvoker)delegate
+            {
+                this.Close();
+            });
+        }
     //    public DPFP.Processing.Enrollment Enroller;
 
     }

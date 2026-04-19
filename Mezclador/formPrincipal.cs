@@ -205,30 +205,29 @@ namespace Mezclador
         private void button1_Click(object sender, EventArgs e)
         {
             RegistroHuella Enroller = new();
-            Enroller.OnTemplate += this.OnTemplate;
+            //Enroller.OnTemplate += this.OnTemplate;
             Enroller.ShowDialog();
         }
 
-        private void OnTemplate(DPFP.Template template)
-        {
-            this.Invoke(new Function(delegate ()
-            {
-                Template = template;
-                //Template != null para saber si hay un template
-                //VerifyButton.Enabled = SaveButton.Enabled = (Template != null);
-                if (Template != null)
-                    MessageBox.Show("El registro de la huella se ha completado.", "Registro de huella");
-                else
-                    MessageBox.Show("El registro de la huella no fue valido, vuelva a intentarlo.", "Registro de huella");
-            }));
-        }
+        //private void OnTemplate(DPFP.Template template)
+        //{
+        //    this.Invoke(new Function(delegate ()
+        //    {
+        //        Template = template;
+        //        //Template != null para saber si hay un template
+        //        //VerifyButton.Enabled = SaveButton.Enabled = (Template != null);
+        //        if (Template != null)
+        //            MessageBox.Show("El registro de la huella se ha completado.", "Registro de huella");
+        //        else
+        //            MessageBox.Show("El registro de la huella no fue valido, vuelva a intentarlo.", "Registro de huella");
+        //    }));
+        //}
 
-        private DPFP.Template Template;
 
         private void button2_Click_1(object sender, EventArgs e)
         {
             LeerHuella leerHuella = new();
-            leerHuella.Verify(Template);
+            leerHuella.Verify();
         }
 
         private void btnWeightLigeroOK_Click(object sender, EventArgs e)
@@ -406,7 +405,7 @@ namespace Mezclador
                 ControlOrdenes.ShowLogin = false;
                 await Task.Delay(100);
                 LeerHuella leerHuella = new();
-                leerHuella.Verify(Template);
+                leerHuella.Verify();
             }
         }
 
@@ -480,7 +479,7 @@ namespace Mezclador
         private void BtnCalidad_Click(object sender, EventArgs e)
         {
             LeerHuella leerHuella = new(OnlyQuality: true);
-            leerHuella.Verify(Template);
+            leerHuella.Verify();
         }
 
         private void lblCargaCount_Click(object sender, EventArgs e)

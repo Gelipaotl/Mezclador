@@ -4,19 +4,32 @@
 
 using libzkfpcsharp;
 using Mezclador.FingerPrint;
-using static Mezclador.FingerPrint.FingerService;
+using Mezclador.Models;
+using Mezclador.Users;
+using OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
 using System;
 using System.Security.Principal;
+using static Mezclador.FingerPrint.FingerService;
+using static Mezclador.Users.Usuario;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace Mezclador
 {
 
     public partial class Fingerprint : Form//, DPFP.Capture.EventHandler
     {
+        public bool _onlyQuality = false;
         public Fingerprint()
         {
             InitializeComponent();
             Init();
+            if (!IsInitialized)
+            {
+                Prompt.Text = "Lector de huella no encontrado.";
+                Status.Text = "Reabra esta ventana para reintentar";
+            }
+            else
+                Prompt.Text = "Coloque su huella.";
         }
         protected virtual void Init()
         {
@@ -46,20 +59,26 @@ namespace Mezclador
                         BitmapFormat.GetBitmap(FPBuffer, mfpWidth, mfpHeight, ref ms);
                         Bitmap bmp = new Bitmap(ms);
                         this.Picture.Image = bmp;
-                        if (IsRegister)
+                        if (IsRegister) // si esta enrolando huella
                         {
                             int ret = zkfp.ZKFP_ERR_OK;
-                            int fid = 0, score = 0;
-                            ret = zkfp2.DBIdentify(mDBHandle, CapTmp, ref fid, ref score);
-                            if (zkfp.ZKFP_ERR_OK == ret)
+                            //int fid = 0, score = 0;
+                            //ret = zkfp2.DBIdentify(mDBHandle, CapTmp, ref fid, ref score);
+                            //if (zkfp.ZKFP_ERR_OK == ret)
+                            //{
+                            //    //textRes.Text = "This finger was already register by " + fid + "!";
+                            //    return;
+                            //}
+                            
+                            if (RegisterCount > 0)
                             {
-                                //textRes.Text = "This finger was already register by " + fid + "!";
-                                return;
-                            }
-                            if (RegisterCount > 0 && zkfp2.DBMatch(mDBHandle, CapTmp, RegTmps[RegisterCount - 1]) <= 0)
-                            {
-                                //textRes.Text = "Please press the same finger 3 times for the enrollment";
-                                return;
+                                int score = zkfp2.DBMatch(mDBHandle, CapTmp, RegTmps[RegisterCount - 1]);
+                                StatusLine.Text = $"Coincidencia de la huella: {score}";
+                                if (score <= 0)
+                                {
+                                    MakeReport("Debes colocar la misma huella");
+                                    return;
+                                }
                             }
                             Array.Copy(CapTmp, RegTmps[RegisterCount], cbCapTmp);
                             String strBase64 = zkfp2.BlobToBase64(CapTmp, cbCapTmp);
@@ -68,39 +87,44 @@ namespace Mezclador
                             if (RegisterCount >= REGISTER_FINGER_COUNT)
                             {
                                 RegisterCount = 0;
-                                if (zkfp.ZKFP_ERR_OK == (ret = zkfp2.DBMerge(mDBHandle, RegTmps[0], RegTmps[1], RegTmps[2], RegTmp, ref cbRegTmp)) &&
-                                       zkfp.ZKFP_ERR_OK == (ret = zkfp2.DBAdd(mDBHandle, iFid, RegTmp)))
+                                //if (zkfp.ZKFP_ERR_OK == (ret = zkfp2.DBMerge(mDBHandle, RegTmps[0], RegTmps[1], RegTmps[2], RegTmp, ref cbRegTmp)) &&
+                                //       zkfp.ZKFP_ERR_OK == (ret = zkfp2.DBAdd(mDBHandle, iFid, RegTmp)))
+                                if (zkfp.ZKFP_ERR_OK == (ret = zkfp2.DBMerge(mDBHandle, RegTmps[0], RegTmps[1], RegTmps[2], RegTmp, ref cbRegTmp)))
                                 {
-                                    iFid++;
-                                    MessageBox.Show("enroll succ");
+                                    //iFid++;
+                                    RegisterSuccess = true;
+                                    Close();
+                                    //MessageBox.Show("Huella registrada con exito");
                                 }
                                 else
                                 {
-                                    //textRes.Text = "enroll fail, error code=" + ret;
+                                    MakeReport("Error al registrar la huella, error code=" + ret);
                                 }
-                                IsRegister = false;
+                                //IsRegister = false;
                                 return;
                             }
                             else
                             {
-                                //textRes.Text = "You need to press the " + (REGISTER_FINGER_COUNT - RegisterCount) + " times fingerprint";
+                                MakeReport("Lecturas restantes: " + (REGISTER_FINGER_COUNT - RegisterCount));
                             }
                         }
-                        else
+                        else // si no esta enrolando huella
                         {
-                            if (cbRegTmp <= 0)
-                            {
-                                //textRes.Text = "Please register your finger first!";
-                                return;
-                            }
-                            if (bIdentify)
+                            //if (cbRegTmp <= 0)
+                            //{
+                            //    //textRes.Text = "Please register your finger first!";
+                            //    return;
+                            //} 
+                            if (bIdentify) //si esta leyendo huella
                             {
                                 int ret = zkfp.ZKFP_ERR_OK;
                                 int fid = 0, score = 0;
-                                ret = zkfp2.DBIdentify(mDBHandle, CapTmp, ref fid, ref score);
-                                if (zkfp.ZKFP_ERR_OK == ret)
+                                //ret = zkfp2.DBIdentify(mDBHandle, CapTmp, ref fid, ref score);
+
+                                //if (zkfp.ZKFP_ERR_OK == ret)
+                                if (SearchDBFinger())
                                 {
-                                    MessageBox.Show("Identify succ, fid= " + fid + ",score=" + score + "!");
+                                    //MessageBox.Show("Identify succ, fid= " + fid + ",score=" + score + "!");
                                     return;
                                 }
                                 else
@@ -109,19 +133,19 @@ namespace Mezclador
                                     return;
                                 }
                             }
-                            else
+                            else //si quiere validar la calidad de la huella (tal vez se quite esto)
                             {
-                                int ret = zkfp2.DBMatch(mDBHandle, CapTmp, RegTmp);
-                                if (0 < ret)
-                                {
-                                    MessageBox.Show("Match finger succ, score=" + ret + "!");
-                                    return;
-                                }
-                                else
-                                {
-                                    MessageBox.Show("Match finger fail, ret= " + ret);
-                                    return;
-                                }
+                                //int ret = zkfp2.DBMatch(mDBHandle, CapTmp, RegTmp);
+                                //if (0 < ret)
+                                //{
+                                //    MessageBox.Show("Match finger succ, score=" + ret + "!");
+                                //    return;
+                                //}
+                                //else
+                                //{
+                                //    MessageBox.Show("Match finger fail, ret= " + ret);
+                                //    return;
+                                //}
                             }
                         }
                     }
@@ -132,7 +156,119 @@ namespace Mezclador
                     break;
             }
         }
+        private bool IsValidZkTemplate(byte[] template)
+        {
+            if (template == null || template.Length < 100)
+                return false;
 
+            IntPtr tempDb = zkfp2.DBInit();
+
+            int ret = zkfp2.DBAdd(tempDb, 1, template);
+
+            zkfp2.DBFree(tempDb);
+
+            return ret == zkfp.ZKFP_ERR_OK;
+        }
+        public bool SearchDBFinger()
+        {
+            bool result = false;
+            var template = CapTmp;
+            var templateSize = cbCapTmp;
+
+            foreach (var item in Huellas.ListHuellas)
+            {
+                if (item.Huella.Length > 1500)
+                    continue;
+                try
+                {
+                    if (!IsValidZkTemplate(item.Huella))
+                    {
+                        MakeReport("La huella es INCORRECTA.");
+                        continue; // Es U.are.U, lo ignoramos
+                    }
+
+                    var score = zkfp2.DBMatch(mDBHandle, template, item.Huella);
+                    StatusLine.Text = $"Coincidencia de la huella: {score}";
+                    //DPFP.Template template = new();
+                    //template.DeSerialize(item.Huella);
+
+                    //Verificator.Verify(features, template, ref result);
+                    //UpdateStatus(result.FARAchieved);
+                    if (score > 60)
+                    {
+                        MakeReport("La huella es CORRECTA.");
+                        if (_onlyQuality)
+                        {
+                            if (item.Permisos != Permisos.Calidad.ToString() &&
+                                item.Permisos != Permisos.Total.ToString())
+                            {
+                                //MessageBox.Show("La huella no corresponde a Calidad");
+                                MakeReport("La huella no corresponde a Calidad");
+                            }
+                            else
+                            {
+                                comentarioCalidad comCalidad = new();
+                                comCalidad.ShowDialog();
+                                string comentario = comCalidad.Comentario;
+
+                                if (ConexionDB.QualityRegister(item.Id, comentario))
+                                {
+                                    MakeReport("Huella de calidad registrada");
+                                    Close();
+                                    //MessageBox.Show("Huella de calidad registrada");
+                                }
+                            }
+                            break;
+                        }
+                        MoveModelToLogged(item.Id, item.Nombre, item.Permisos);
+                        //UserLoged = true;
+                        bIdentify = false;
+                        Close();
+                        break;
+                    }
+                    else
+                        MakeReport("La huella es INCORRECTA.");
+                }
+                catch (Exception ex)
+                {
+                    // Handle any exceptions that occur during deserialization or verification
+                    MakeReport($"Error al verificar la huella de {item.Nombre}: {ex.Message}");
+                }
+            }
+
+            if (Huellas.ListHuellas.Count <= 0)
+                MakeReport("No hay usuarios registrados.");
+            return false;
+        }
+        public void MoveModelToLogged(int Id, string Nombre, string Permisos)
+        {
+            try
+            {
+                Usuario.Id = Id;
+                Usuario.Nombre = Nombre;
+                // Intentar convertir el string al valor del enum
+                if (Enum.TryParse(Permisos, true, out Permisos permiso))
+                {
+                    // La conversión fue exitosa
+                    Usuario.Permiso = permiso;
+                }
+                else
+                {
+                    // El string no coincide con ningún valor del enum
+                    MessageBox.Show("El permiso de este usuario en la base de datos no coincide con los de esta aplicación.");
+                }
+                if (ControlOrdenes.idOrden > 0 && ControlOrdenes.Order.Length > 0 && Usuario.Id > 0)
+                {
+                    OrdenModel? existentOrder = ConexionDB.CheckOrderExist(ControlOrdenes.Order);
+                    if (existentOrder is not null)
+                        ControlOrdenes.Status = (OrderStatus)Enum.Parse(typeof(OrderStatus), existentOrder.Status);
+                    if (ControlOrdenes.Status == OrderStatus.InProcess)
+                        ControlOrdenes.CreateCarga();
+                    //MessageBox.Show($"No se pudo crear la carga, error en archivo: {this.Name}");
+                }
+            }
+            catch (Exception ex) { MessageBox.Show("Error en MoveModelToLogged: " + ex.Message); }
+        }
         //protected virtual void Process(Sample Sample)
         //{
         //    // Draw fingerprint sample image.
@@ -183,18 +319,18 @@ namespace Mezclador
 
         public void OnFingerTouch(object Capture, string ReaderSerialNumber)
         {
-            MakeReport("Se ha tocado el lector de huellas.");
+            //MakeReport("Se ha tocado el lector de huellas.");
         }
 
         public void OnReaderConnect(object Capture, string ReaderSerialNumber)
         {
-            MakeReport("El lector de huellas está conectado.");
+            //MakeReport("El lector de huellas está conectado.");
         }
 
         public void OnReaderDisconnect(object Capture, string ReaderSerialNumber)
         {
-            MakeReport("El lector de huellas está desconectado.");
-            SetPrompt("El lector de huellas está desconectado.");
+            //MakeReport("El lector de huellas está desconectado.");
+            //SetPrompt("El lector de huellas está desconectado.");
         }
 
         //public void OnSampleQuality(object Capture, string ReaderSerialNumber, CaptureFeedback CaptureFeedback)
@@ -240,6 +376,11 @@ namespace Mezclador
         //    else
         //        return null;
         //}
+        public void Register()
+        {
+            FingerService.Register();
+            Status.Text = "Lecturas restantes: " + (FingerService.REGISTER_FINGER_COUNT - FingerService.RegisterCount);
+        } 
         protected void MakeReport(string status)
         {
             this.Invoke(new Function(delegate ()

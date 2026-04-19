@@ -15,6 +15,7 @@ namespace Mezclador.FingerPrint
         public static IntPtr FormHandle = IntPtr.Zero;
         public static bool bIsTimeToDie = false;
         public static bool IsRegister = false;
+        public static bool RegisterSuccess = false;
         public static bool IsInitialized = false;
         //public static bool IsOpen = false;
         public static bool bIdentify = true;
@@ -61,13 +62,13 @@ namespace Mezclador.FingerPrint
                 else
                 {
                     zkfp2.Terminate();
-                    MessageBox.Show("No se pudo conectar el lector de huella vuelva a intentarlo");
+                    //MessageBox.Show("No se pudo conectar el lector de huella vuelva a intentarlo");
                     return;
                 }
             }
             else
             {
-                MessageBox.Show("No se pudo conectar el lector de huella vuelva a intentarlo, ret=" + ret + " !");
+                //MessageBox.Show("No se pudo conectar el lector de huella vuelva a intentarlo, ret=" + ret + " !");
                 return;
             }
             Open();
@@ -111,17 +112,20 @@ namespace Mezclador.FingerPrint
             captureThread.IsBackground = true;
             captureThread.Start();
             bIsTimeToDie = false;
-            MessageBox.Show("Open success");
+            //MessageBox.Show("Open success");
             IsInitialized = true;
         }
         public static void Register()
         {
-            if (!IsRegister)
+            //if (!IsRegister) // no me funciona si cierran la ventana antes de hacer el registro
+            if (IsInitialized)
             {
+                bIdentify = false;
                 IsRegister = true;
+                RegisterSuccess = false;
                 RegisterCount = 0;
                 cbRegTmp = 0;
-                MessageBox.Show("Please press your finger 3 times!");
+                //MessageBox.Show("Please press your finger 3 times!");
             }
         }
         public static void Identify()
@@ -130,6 +134,10 @@ namespace Mezclador.FingerPrint
             if (IsInitialized && !bIdentify)
             {
                 bIdentify = true;
+                IsRegister = false;
+                RegisterSuccess = false;
+                RegisterCount = 0;
+                cbRegTmp = 0;
                 //textRes.Text = "Please press your finger!";
             }
         }

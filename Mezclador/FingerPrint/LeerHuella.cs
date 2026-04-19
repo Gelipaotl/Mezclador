@@ -10,15 +10,14 @@ namespace Mezclador
 {
     public partial class LeerHuella : Fingerprint
     {
-        bool _onlyQuality;
         public LeerHuella(bool OnlyQuality = false)
         {
             _onlyQuality = OnlyQuality;
         }
         public bool UserLoged = false;
-        public void Verify(DPFP.Template template)
+        public void Verify()
         {
-            Template = template;
+            //Template = template;
 
             ShowDialog();
         }
@@ -27,7 +26,7 @@ namespace Mezclador
         {
             base.Init();
             base.Text = "Lectura de huella";
-            Verificator = new DPFP.Verification.Verification();     // Create a fingerprint template verificator
+            //Verificator = new DPFP.Verification.Verification();     // Create a fingerprint template verificator
             UpdateStatus(0);
 
             btnPassword.Click += new EventHandler(btnPass_Click);
@@ -120,35 +119,35 @@ namespace Mezclador
             // Show "False accept rate" value
             //SetStatus(String.Format($"Tasa de rechazo (FAR) = {FAR}"));
         }
-        private void MoveModelToLogged(int Id, string Nombre, string Permisos)
-        {
-            try
-            {
-                Usuario.Id = Id;
-                Usuario.Nombre = Nombre;
-                // Intentar convertir el string al valor del enum
-                if (Enum.TryParse(Permisos, true, out Permisos permiso))
-                {
-                    // La conversión fue exitosa
-                    Usuario.Permiso = permiso;
-                }
-                else
-                {
-                    // El string no coincide con ningún valor del enum
-                    MessageBox.Show("El permiso de este usuario en la base de datos no coincide con los de esta aplicación.");
-                }
-                if (ControlOrdenes.idOrden > 0 && ControlOrdenes.Order.Length > 0 && Usuario.Id > 0)
-                {
-                    OrdenModel? existentOrder = ConexionDB.CheckOrderExist(ControlOrdenes.Order);
-                    if (existentOrder is not null)
-                        ControlOrdenes.Status = (OrderStatus)Enum.Parse(typeof(OrderStatus), existentOrder.Status);
-                    if (ControlOrdenes.Status == OrderStatus.InProcess)
-                        ControlOrdenes.CreateCarga();
-                    //MessageBox.Show($"No se pudo crear la carga, error en archivo: {this.Name}");
-                }
-            }
-            catch (Exception ex) { MessageBox.Show("Error en MoveModelToLogged: " + ex.Message); }
-        }
+        //private void MoveModelToLogged(int Id, string Nombre, string Permisos)
+        //{
+        //    try
+        //    {
+        //        Usuario.Id = Id;
+        //        Usuario.Nombre = Nombre;
+        //        // Intentar convertir el string al valor del enum
+        //        if (Enum.TryParse(Permisos, true, out Permisos permiso))
+        //        {
+        //            // La conversión fue exitosa
+        //            Usuario.Permiso = permiso;
+        //        }
+        //        else
+        //        {
+        //            // El string no coincide con ningún valor del enum
+        //            MessageBox.Show("El permiso de este usuario en la base de datos no coincide con los de esta aplicación.");
+        //        }
+        //        if (ControlOrdenes.idOrden > 0 && ControlOrdenes.Order.Length > 0 && Usuario.Id > 0)
+        //        {
+        //            OrdenModel? existentOrder = ConexionDB.CheckOrderExist(ControlOrdenes.Order);
+        //            if (existentOrder is not null)
+        //                ControlOrdenes.Status = (OrderStatus)Enum.Parse(typeof(OrderStatus), existentOrder.Status);
+        //            if (ControlOrdenes.Status == OrderStatus.InProcess)
+        //                ControlOrdenes.CreateCarga();
+        //            //MessageBox.Show($"No se pudo crear la carga, error en archivo: {this.Name}");
+        //        }
+        //    }
+        //    catch (Exception ex) { MessageBox.Show("Error en MoveModelToLogged: " + ex.Message); }
+        //}
 
 
         private void button_Click(object sender, EventArgs e)
@@ -213,9 +212,6 @@ namespace Mezclador
                 this.Close();
             });
         }
-
-        private DPFP.Template Template;
-        private DPFP.Verification.Verification Verificator;
 
         private void btnPassword_Click(object sender, EventArgs e)
         {

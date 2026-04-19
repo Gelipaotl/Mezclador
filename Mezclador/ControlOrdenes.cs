@@ -8,6 +8,13 @@ namespace Mezclador
     public enum OrderStatus { NoOrder, InProcess, Completed, Canceled }
     public static class ControlOrdenes
     {
+        private static readonly Image ImgConfig600 = Resources.BtnConfig600;
+        private static readonly Image ImgOrden = Resources.order;
+        private static readonly Image ImgComaflex = Resources.comaflex;
+        private static readonly Image ImgOk = Resources.ok;
+        private static readonly Image ImgScanner = Resources.Scaner;
+        private static readonly Image ImgBascula = Resources.Bascula;
+
         public static bool ShowLogin = false;
         public static string Order { get; private set; } = string.Empty;
         public static OrdenModel SelectedOrder { get; private set; } = new();
@@ -215,6 +222,12 @@ namespace Mezclador
             }
         }
 
+        private static void SetImage(Image? img)
+        {
+            if (!ReferenceEquals(ActualImagen, img))
+                ActualImagen = img;
+        }
+
         private static void Timer_Elapsed(object? sender, System.Timers.ElapsedEventArgs e)
         {
             //ReqPeso = ;
@@ -222,20 +235,22 @@ namespace Mezclador
             if (string.IsNullOrEmpty(Usuario.Nombre))
             {
                 InstructionText = "Inicia sesión";
-				InstructionLigeros = string.Empty;
-				InstructionPesados = string.Empty;
+                InstructionLigeros = string.Empty;
+                InstructionPesados = string.Empty;
                 InstObjetivoLigero = $"";
                 InstObjetivoPesado = $"";
-                ActualImagen = Resources.BtnConfig600;
+                //ActualImagen = Resources.BtnConfig600;
+                SetImage(ImgConfig600);
                 sequenceRunning = false;
                 return;
             }
             if (Order == string.Empty || Order == "clear")
             {
                 InstructionText = "Escanea una orden";
-                ActualImagen = Resources.order;
-				InstructionLigeros = string.Empty;
-				InstructionPesados = string.Empty;
+                //ActualImagen = Resources.order;
+                SetImage(ImgOrden);
+                InstructionLigeros = string.Empty;
+                InstructionPesados = string.Empty;
                 InstObjetivoLigero = $"";
                 InstObjetivoPesado = $"";
                 sequenceRunning = false;
@@ -244,28 +259,32 @@ namespace Mezclador
             if (Status == OrderStatus.Canceled)
             {
                 InstructionText = "Orden Cerrada";
-                ActualImagen = Resources.ok;
+                //ActualImagen = Resources.ok;
+                SetImage(ImgOk);
                 sequenceRunning = false;
                 return;
             }
             if (Status == OrderStatus.Completed)
             {
                 InstructionText = "Orden Completada";
-                ActualImagen = Resources.ok;
+                //ActualImagen = Resources.ok;
+                SetImage(ImgOk);
                 sequenceRunning = false;
                 return;
             }
             if (SelectedProducto.Producto == string.Empty)
             {
                 InstructionText = "Selecciona un Producto";
-                ActualImagen = Resources.comaflex;
+                //ActualImagen = Resources.comaflex;
+                SetImage(ImgComaflex);
                 sequenceRunning = false;
                 return;
             }
             if (RequiredAmount == string.Empty)
             {
                 InstructionText = "Introduce la cantidad requerida";
-                ActualImagen = Resources.comaflex;
+                //ActualImagen = Resources.comaflex;
+                SetImage(ImgComaflex);
                 sequenceRunning = false;
                 return;
             }
@@ -344,26 +363,26 @@ namespace Mezclador
                     }
                 }
 
-				if (CodigoLigeroOk)
-				{
-					if (materialLigeroToWeight.Saco && !SacoLigeroReady)
-					{//si se maneja por sacos hacer el calculo solo una vez
-						SacosLigerosNecesarios = 0;
-						SacosLigerosNecesarios = (int)(materialLigeroToWeight.Cantidad / materialLigeroToWeight.PesoSaco);
-						SacoLigeroFraccion = materialLigeroToWeight.Cantidad % materialLigeroToWeight.PesoSaco;
-						SacoLigeroFraccion = Math.Round(SacoLigeroFraccion, 3);
-						SacosLigerosCargados = 0;
-						SacoLigeroReady = true;
-					}
-					if (materialLigeroToWeight.Saco && SacoLigeroReady)
-					{//si se maneja por sacos empezar a pedir cada uno
-						if (SacosLigerosCargados < SacosLigerosNecesarios)
+                if (CodigoLigeroOk)
+                {
+                    if (materialLigeroToWeight.Saco && !SacoLigeroReady)
+                    {//si se maneja por sacos hacer el calculo solo una vez
+                        SacosLigerosNecesarios = 0;
+                        SacosLigerosNecesarios = (int)(materialLigeroToWeight.Cantidad / materialLigeroToWeight.PesoSaco);
+                        SacoLigeroFraccion = materialLigeroToWeight.Cantidad % materialLigeroToWeight.PesoSaco;
+                        SacoLigeroFraccion = Math.Round(SacoLigeroFraccion, 3);
+                        SacosLigerosCargados = 0;
+                        SacoLigeroReady = true;
+                    }
+                    if (materialLigeroToWeight.Saco && SacoLigeroReady)
+                    {//si se maneja por sacos empezar a pedir cada uno
+                        if (SacosLigerosCargados < SacosLigerosNecesarios)
                         {//Cargue saco {SacosLigerosCargados + 1}{Environment.NewLine}
                             InstObjetivoLigero = $"Saco {SacosLigerosCargados + 1}";
                             InstructionLigeros = $"{MaterialLigeroAPesar.Material}{Environment.NewLine} {MaterialLigeroAPesar.Nombre}";
-						}
-						else
-						{//carga de sacos completa falta la fraccion
+                        }
+                        else
+                        {//carga de sacos completa falta la fraccion
                             if (SacoLigeroFraccion > 0) //-{ SacoLigeroFraccion} kg - {Environment.NewLine}
                             {
                                 InstObjetivoLigero = $"{SacoLigeroFraccion} kg";
@@ -371,59 +390,59 @@ namespace Mezclador
                             }
                             else
                                 PesoLigeroOk = true;
-						}
-					}
-					if (!materialLigeroToWeight.Saco)
-					{
-						if (MaterialLigeroAPesar.Nombre is not null)
-						{
-							if (MaterialLigeroAPesar.esAceite)
-							//if (MaterialLigeroAPesar.Nombre.Contains("Chevron") || MaterialLigeroAPesar.Nombre.Contains("chevron"))
-							{
-								double? litros = 0.0;
-								double kilos = 0.0;
-								double.TryParse(CantidadLigeraAPesar, out kilos);
-								if (UserSettings.Densidad > 0)//-{litros?.ToString("0.###")} Litros-{Environment.NewLine}
+                        }
+                    }
+                    if (!materialLigeroToWeight.Saco)
+                    {
+                        if (MaterialLigeroAPesar.Nombre is not null)
+                        {
+                            if (MaterialLigeroAPesar.esAceite)
+                            //if (MaterialLigeroAPesar.Nombre.Contains("Chevron") || MaterialLigeroAPesar.Nombre.Contains("chevron"))
+                            {
+                                double? litros = 0.0;
+                                double kilos = 0.0;
+                                double.TryParse(CantidadLigeraAPesar, out kilos);
+                                if (UserSettings.Densidad > 0)//-{litros?.ToString("0.###")} Litros-{Environment.NewLine}
                                     litros = kilos / UserSettings.Densidad;
 
                                 InstObjetivoLigero = $"{litros?.ToString("0.###")} L";
                                 InstructionLigeros = $"{MaterialLigeroAPesar.Material}{Environment.NewLine} {MaterialLigeroAPesar.Nombre}";
-							}
-							else
+                            }
+                            else
                             {//-{CantidadLigeraAPesar} kg-{Environment.NewLine}
                                 InstObjetivoLigero = $"{CantidadLigeraAPesar} kg";
                                 InstructionLigeros = $"{MaterialLigeroAPesar.Material}{Environment.NewLine} {MaterialLigeroAPesar.Nombre}";
-							}
-							SacoLigeroReady = false;
-						}
-					}
-				}
+                            }
+                            SacoLigeroReady = false;
+                        }
+                    }
+                }
 
-				if (PesoLigeroOk && CodigoLigeroOk)
-				{
-					Thread.Sleep(200);
-					materialLigeroToWeight.Passed = true;
-					SacoLigeroFraccion = 0.0;
-					SacosLigerosCargados = 0;
-					SacosLigerosNecesarios = 0;
-					SacoLigeroReady = false;
-					PesoLigeroOk = false;
-					CodigoLigeroOk = false;
-				}
-			}
-			else
-			{
-				MaterialLigeroAPesar = null;
-				CantidadLigeraAPesar = string.Empty;
-			}
+                if (PesoLigeroOk && CodigoLigeroOk)
+                {
+                    Thread.Sleep(200);
+                    materialLigeroToWeight.Passed = true;
+                    SacoLigeroFraccion = 0.0;
+                    SacosLigerosCargados = 0;
+                    SacosLigerosNecesarios = 0;
+                    SacoLigeroReady = false;
+                    PesoLigeroOk = false;
+                    CodigoLigeroOk = false;
+                }
+            }
+            else
+            {
+                MaterialLigeroAPesar = null;
+                CantidadLigeraAPesar = string.Empty;
+            }
 
-			if (materialPesadoToWeight is not null)///////////////////////////////
+            if (materialPesadoToWeight is not null)///////////////////////////////
             {
                 CantidadPesadaAPesar = materialPesadoToWeight.Cantidad.ToString();
                 MaterialPesadoAPesar = materialPesadoToWeight;
 
-				if (CodigoPesadoOk == false)
-				{
+                if (CodigoPesadoOk == false)
+                {
                     //if (!materialToWeight.Escaneable)
                     if (!materialPesadoToWeight.Escaneable)
                         CodigoPesadoOk = true;
@@ -432,27 +451,27 @@ namespace Mezclador
                         InstructionPesados = $"Escanee{Environment.NewLine}{MaterialPesadoAPesar.Material}{Environment.NewLine} {MaterialPesadoAPesar.Nombre}";
                         InstObjetivoPesado = $"";
                     }
-				}
-				if (CodigoPesadoOk)
-				{
-					if (materialPesadoToWeight.Saco && !SacoPesadoReady)
-					{//si se maneja por sacos hacer el calculo solo una vez
-						SacosPesadosNecesarios = 0;
-						SacosPesadosNecesarios = (int)(materialPesadoToWeight.Cantidad / materialPesadoToWeight.PesoSaco);
-						SacoPesadoFraccion = materialPesadoToWeight.Cantidad % materialPesadoToWeight.PesoSaco;
-						SacoPesadoFraccion = Math.Round(SacoPesadoFraccion, 3);
-						SacosPesadosCargados = 0;
-						SacoPesadoReady = true;
-					}
-					if (materialPesadoToWeight.Saco && SacoPesadoReady)
-					{//si se maneja por sacos empezar a pedir cada uno
-						if (SacosPesadosCargados < SacosPesadosNecesarios)
+                }
+                if (CodigoPesadoOk)
+                {
+                    if (materialPesadoToWeight.Saco && !SacoPesadoReady)
+                    {//si se maneja por sacos hacer el calculo solo una vez
+                        SacosPesadosNecesarios = 0;
+                        SacosPesadosNecesarios = (int)(materialPesadoToWeight.Cantidad / materialPesadoToWeight.PesoSaco);
+                        SacoPesadoFraccion = materialPesadoToWeight.Cantidad % materialPesadoToWeight.PesoSaco;
+                        SacoPesadoFraccion = Math.Round(SacoPesadoFraccion, 3);
+                        SacosPesadosCargados = 0;
+                        SacoPesadoReady = true;
+                    }
+                    if (materialPesadoToWeight.Saco && SacoPesadoReady)
+                    {//si se maneja por sacos empezar a pedir cada uno
+                        if (SacosPesadosCargados < SacosPesadosNecesarios)
                         {//Cargue saco {SacosPesadosCargados + 1}{Environment.NewLine}
                             InstObjetivoPesado = $"Saco {SacosPesadosCargados + 1}";
                             InstructionPesados = $"{MaterialPesadoAPesar.Material}{Environment.NewLine} {MaterialPesadoAPesar.Nombre}";
-						}
-						else
-						{//carga de sacos completa falta la fraccion
+                        }
+                        else
+                        {//carga de sacos completa falta la fraccion
                             if (SacoPesadoFraccion > 0)//-{SacoPesadoFraccion} kg-{Environment.NewLine}
                             {
                                 InstObjetivoPesado = $"{SacoPesadoFraccion} kg";
@@ -460,46 +479,46 @@ namespace Mezclador
                             }
                             else
                                 PesoPesadoOk = true;
-						}
-					}
-					if (!materialPesadoToWeight.Saco)
-					{
-						if (MaterialPesadoAPesar.Nombre is not null)
-						{
-							if (MaterialPesadoAPesar.esAceite)
-							//if (MaterialPesadoAPesar.Nombre.Contains("Chevron") || MaterialPesadoAPesar.Nombre.Contains("chevron"))
-							{
-								double? litros = 0.0;
-								double kilos = 0.0;
-								double.TryParse(CantidadPesadaAPesar, out kilos);
-								if (UserSettings.Densidad > 0)
-									litros = kilos / UserSettings.Densidad;
+                        }
+                    }
+                    if (!materialPesadoToWeight.Saco)
+                    {
+                        if (MaterialPesadoAPesar.Nombre is not null)
+                        {
+                            if (MaterialPesadoAPesar.esAceite)
+                            //if (MaterialPesadoAPesar.Nombre.Contains("Chevron") || MaterialPesadoAPesar.Nombre.Contains("chevron"))
+                            {
+                                double? litros = 0.0;
+                                double kilos = 0.0;
+                                double.TryParse(CantidadPesadaAPesar, out kilos);
+                                if (UserSettings.Densidad > 0)
+                                    litros = kilos / UserSettings.Densidad;
                                 InstObjetivoPesado = $"{litros?.ToString("0.###")} L";
                                 //-{litros?.ToString("0.###")} Litros-{Environment.NewLine}
                                 InstructionPesados = $"{MaterialPesadoAPesar.Material}{Environment.NewLine} {MaterialPesadoAPesar.Nombre}";
-							}
-							else
+                            }
+                            else
                             {//-{CantidadPesadaAPesar} kg-{Environment.NewLine}
                                 InstObjetivoPesado = $"{CantidadPesadaAPesar} kg";
                                 InstructionPesados = $"{MaterialPesadoAPesar.Material}{Environment.NewLine} {MaterialPesadoAPesar.Nombre}";
-							}
-							SacoPesadoReady = false;
-						}
-					}
-				}
+                            }
+                            SacoPesadoReady = false;
+                        }
+                    }
+                }
 
-				if (PesoPesadoOk && CodigoPesadoOk)
-				{
-					Thread.Sleep(200);
-					materialPesadoToWeight.Passed = true;
-					SacoPesadoFraccion = 0.0;
-					SacosPesadosCargados = 0;
-					SacosPesadosNecesarios = 0;
-					SacoPesadoReady = false;
-					PesoPesadoOk = false;
-					CodigoPesadoOk = false;
-				}
-			}
+                if (PesoPesadoOk && CodigoPesadoOk)
+                {
+                    Thread.Sleep(200);
+                    materialPesadoToWeight.Passed = true;
+                    SacoPesadoFraccion = 0.0;
+                    SacosPesadosCargados = 0;
+                    SacosPesadosNecesarios = 0;
+                    SacoPesadoReady = false;
+                    PesoPesadoOk = false;
+                    CodigoPesadoOk = false;
+                }
+            }
             else
             {
                 MaterialPesadoAPesar = null;
@@ -509,61 +528,64 @@ namespace Mezclador
             if (materialLigeroToWeight?.Imagen is not null)
                 ActualImagen = materialLigeroToWeight.Imagen;
             else if (materialPesadoToWeight?.Imagen is not null)
-                    ActualImagen = materialPesadoToWeight.Imagen;
+                ActualImagen = materialPesadoToWeight.Imagen;
             else
             {
                 //ActualImagen = null;
                 if ((CodigoLigeroOk == false && CantidadLigeraAPesar != string.Empty) || (CodigoPesadoOk == false && CantidadPesadaAPesar != string.Empty))
-                    ActualImagen = Resources.Scaner;
+                    //ActualImagen = Resources.Scaner;
+                    SetImage(ImgScanner);
                 else
-                    ActualImagen = Resources.Bascula;
+                    //ActualImagen = Resources.Bascula; 
+                    SetImage(ImgBascula);
             }
 
             //Ambos pesajes terminados
-			if (materialPesadoToWeight is null && materialLigeroToWeight is null)
-			{
-				InstructionText = $"Pesaje terminado";
-				//ActualImagen = null;
-				ActualImagen = Resources.ok;
+            if (materialPesadoToWeight is null && materialLigeroToWeight is null)
+            {
+                InstructionText = $"Pesaje terminado";
+                //ActualImagen = null;
+                //ActualImagen = Resources.ok; 
+                SetImage(ImgOk);
 
-				if (!ConexionDB.UpdateCarga(idCarga))
-					MessageBox.Show($"error al UpdateCarga {idCarga}");
+                if (!ConexionDB.UpdateCarga(idCarga))
+                    MessageBox.Show($"error al UpdateCarga {idCarga}");
 
-				ConexionDB.RegisterConsumption(Materials, idOrden);
+                ConexionDB.RegisterConsumption(Materials, idOrden);
 
-				if (ActualCarga >= RequiredProducts)//cuando termina todas las cargas
-				{
-					InstructionText = $"Orden Completada";
-					Status = OrderStatus.Completed;
-					ConexionDB.UpdateOrderStatus(idOrden, Status);
-					//Email email = new(idOrden);
-					//email.CreateReport(idOrden);
-				}
+                if (ActualCarga >= RequiredProducts)//cuando termina todas las cargas
+                {
+                    InstructionText = $"Orden Completada";
+                    Status = OrderStatus.Completed;
+                    ConexionDB.UpdateOrderStatus(idOrden, Status);
+                    //Email email = new(idOrden);
+                    //email.CreateReport(idOrden);
+                }
 
-				Thread.Sleep(1000);
+                Thread.Sleep(1000);
 
-				if (ActualCarga >= RequiredProducts)
-				{
-					ClearData();
-				}
+                if (ActualCarga >= RequiredProducts)
+                {
+                    ClearData();
+                }
 
-				Usuario.Logout();
-				if (Materials is not null)
-				{
-					foreach (var product in Materials)
-					{
-						product.Passed = false;
-					}
-				}
+                Usuario.Logout();
+                if (Materials is not null)
+                {
+                    foreach (var product in Materials)
+                    {
+                        product.Passed = false;
+                    }
+                }
 
-				ShowLogin = true;
-				ActualImagen = null;
-				return;
-			}
-			else
-			{
-				InstructionText = "Siga las indicaciones de cada báscula";
-			}
-		}
+                ShowLogin = true;
+                ActualImagen = null;
+                return;
+            }
+            else
+            {
+                InstructionText = "Siga las indicaciones de cada báscula";
+            }
+        }
     }
 }

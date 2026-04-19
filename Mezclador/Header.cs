@@ -177,7 +177,7 @@ namespace Mezclador
         {
             panelMenuUser.Visible = false;
             LeerHuella leerHuella = new();
-            leerHuella.Verify(Template);
+            leerHuella.Verify();
         }
         private void btnSignin_Click(object sender, EventArgs e)
         {
@@ -195,7 +195,7 @@ namespace Mezclador
             panelMenuUser.Visible = false;
         }
 
-        private DPFP.Template Template;
+        //private DPFP.Template Template;
 
         private void lblLogout_Click(object sender, EventArgs e)
         {

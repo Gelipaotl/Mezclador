@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Mezclador.FingerPrint;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -103,24 +104,32 @@ namespace Mezclador.Users
             registroHuella.ShowDialog();
             //if (registroHuella.Enroller.TemplateStatus ==
             //    DPFP.Processing.Enrollment.Status.Ready)
-            //{
-            //    FirstFinger = registroHuella.Enroller.Template.Bytes;
-            //    btnRegFinger1.Text = "Huella registra";
-            //    btnRegFinger1.Enabled = false;
-            //}
+            if (FingerService.IsRegister && FingerService.RegisterSuccess)
+            {
+                FingerService.IsRegister = false;
+                FingerService.RegisterSuccess = false;
+                //FirstFinger = registroHuella.Enroller.Template.Bytes;
+                FirstFinger = new byte[FingerService.cbRegTmp];
+                Array.Copy(FingerService.RegTmp, FirstFinger, FingerService.cbRegTmp);
+                btnRegFinger1.Text = "Huella registra";
+                btnRegFinger1.Enabled = false;
+            }
         }
 
         private void btnRegFinger2_Click(object sender, EventArgs e)
         {
             RegistroHuella registroHuella = new RegistroHuella();
             registroHuella.ShowDialog();
-            //if (registroHuella.Enroller.TemplateStatus ==
-            //    DPFP.Processing.Enrollment.Status.Ready)
-            //{
-            //    SecondFinger = registroHuella.Enroller.Template.Bytes;
-            //    btnRegFinger2.Text = "Huella registra";
-            //    btnRegFinger2.Enabled = false;
-            //}
+            if (FingerService.IsRegister && FingerService.RegisterSuccess)
+            {
+                FingerService.IsRegister = false;
+                FingerService.RegisterSuccess = false;
+                //SecondFinger = registroHuella.Enroller.Template.Bytes;
+                SecondFinger = new byte[FingerService.cbRegTmp];
+                Array.Copy(FingerService.RegTmp, SecondFinger, FingerService.cbRegTmp);
+                btnRegFinger2.Text = "Huella registra";
+                btnRegFinger2.Enabled = false;
+            }
         }
 
         private void cboxPermisos_SelectedIndexChanged(object sender, EventArgs e)
